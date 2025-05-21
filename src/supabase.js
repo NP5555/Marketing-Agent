@@ -4,10 +4,14 @@ const config = require('./config');
 let supabase = null;
 let supabaseEnabled = true;
 
-// In-memory fallback storage
-const memoryStorage = {
-  messages: []
-};
+// Initialize in-memory storage
+if (!global.memoryStorage) {
+  global.memoryStorage = {
+    messages: [],
+    states: new Map(),
+    responses: new Map()
+  };
+}
 
 /**
  * Initialize the Supabase client
@@ -16,11 +20,11 @@ const memoryStorage = {
 async function initializeSupabase() {
   // Only initialize Supabase if credentials are provided
   if (config.supabaseUrl && config.supabaseKey) {
-    supabase = createClient(config.supabaseUrl, config.supabaseKey);
-    console.log('Supabase client initialized successfully');
-    
-    // Test table access to verify permissions
     try {
+      supabase = createClient(config.supabaseUrl, config.supabaseKey);
+      console.log('Supabase client initialized successfully');
+      
+      // Test table access to verify permissions
       const { error } = await supabase.from('chat_history').select('count');
       if (error) {
         console.error('Supabase permissions error:', error.message);
@@ -42,10 +46,10 @@ async function initializeSupabase() {
 }
 
 // Immediately call initializeSupabase if this module is directly required
-// without explicitly calling the initialization function
 if (config.supabaseUrl && config.supabaseKey) {
   initializeSupabase().catch(error => {
     console.error('Error during automatic Supabase initialization:', error);
+    supabaseEnabled = false;
   });
 }
 
@@ -60,7 +64,7 @@ async function saveMessage(chatId, userId, message) {
   try {
     // Use in-memory storage if Supabase is disabled or has permission issues
     if (!supabase || !supabaseEnabled) {
-      memoryStorage.messages.push({
+      global.memoryStorage.messages.push({
         chat_id: chatId,
         user_id: userId,
         message,
@@ -86,7 +90,7 @@ async function saveMessage(chatId, userId, message) {
       }
       
       // Fallback to in-memory storage
-      memoryStorage.messages.push({
+      global.memoryStorage.messages.push({
         chat_id: chatId,
         user_id: userId,
         message,
@@ -99,7 +103,7 @@ async function saveMessage(chatId, userId, message) {
     console.error('Exception saving message:', error);
     
     // Fallback to in-memory storage on exception
-    memoryStorage.messages.push({
+    global.memoryStorage.messages.push({
       chat_id: chatId,
       user_id: userId,
       message,
@@ -120,7 +124,7 @@ async function getRecentMessages(chatId, limit = 50) {
   try {
     // Use in-memory storage if Supabase is disabled or has permission issues
     if (!supabase || !supabaseEnabled) {
-      return memoryStorage.messages
+      return global.memoryStorage.messages
         .filter(msg => msg.chat_id === chatId)
         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
         .slice(0, limit);
@@ -143,7 +147,7 @@ async function getRecentMessages(chatId, limit = 50) {
       }
       
       // Fallback to in-memory storage
-      return memoryStorage.messages
+      return global.memoryStorage.messages
         .filter(msg => msg.chat_id === chatId)
         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
         .slice(0, limit);
@@ -154,7 +158,7 @@ async function getRecentMessages(chatId, limit = 50) {
     console.error('Exception fetching messages:', error);
     
     // Fallback to in-memory storage on exception
-    return memoryStorage.messages
+    return global.memoryStorage.messages
       .filter(msg => msg.chat_id === chatId)
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
       .slice(0, limit);

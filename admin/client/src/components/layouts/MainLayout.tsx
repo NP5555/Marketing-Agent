@@ -11,6 +11,7 @@ import {
   LocalOffer as OfferIcon,
   Share as LinkIcon,
   Settings as SettingsIcon,
+  Tune as TuneIcon,
   ExitToApp as LogoutIcon,
   AccountCircle
 } from '@mui/icons-material';
@@ -95,6 +96,12 @@ export default function MainLayout() {
             <SettingsIcon />
           </ListItemIcon>
           <ListItemText primary="Bot Config" />
+        </ListItem>
+        <ListItem button onClick={() => handleNavigation('/project-settings')}>
+          <ListItemIcon>
+            <TuneIcon />
+          </ListItemIcon>
+          <ListItemText primary="Project Settings" />
         </ListItem>
       </List>
     </>

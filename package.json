@@ -6,10 +6,13 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "restart": "pkill -f 'node.*src/index.js' || true && npm run dev"
+    "dev:polling": "cross-env DISABLE_WEBHOOK=true nodemon src/index.js",
+    "restart": "node scripts/restart.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
+    "axios": "^1.9.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "node-telegram-bot-api": "^0.61.0",
@@ -17,5 +20,16 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NP5555/Marketing-Agent.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NP5555/Marketing-Agent/issues"
+  },
+  "homepage": "https://github.com/NP5555/Marketing-Agent#readme"
 }

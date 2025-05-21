@@ -12,6 +12,7 @@ const DashboardPage = lazy(() => import('./pages/dashboard/DashboardPage'));
 const OffersPage = lazy(() => import('./pages/offers/OffersPage'));
 const LinksPage = lazy(() => import('./pages/links/LinksPage'));
 const BotConfigPage = lazy(() => import('./pages/bot/BotConfigPage'));
+const ProjectSettingsPage = lazy(() => import('./pages/bot/ProjectSettingsPage'));
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -68,6 +69,7 @@ export default function App() {
             <Route path="/offers" element={<OffersPage />} />
             <Route path="/links" element={<LinksPage />} />
             <Route path="/bot-config" element={<BotConfigPage />} />
+            <Route path="/project-settings" element={<ProjectSettingsPage />} />
           </Route>
           
           {/* Redirects */}
